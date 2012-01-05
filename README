@@ -1,3 +1,59 @@
 How To Free Memory of JIT'd Function
+====================================
 
-It's a test just to confirm how to free memory of JIT'd function correctly.
+It's a test just to confirm how to free memory of LLVM JIT'd function
+properly. I thought ExecutionEngine::freeMachineCodeForFunction()
+and Function::eraseFromParent() would work but my sample code seems
+to leak memory. I need someone to help me!!
+
+The results of Valgrind's heap profiler
+(http://valgrind.org/docs/manual/ms-manual.html) are in the directory
+valgrind-result. For instance, the file "massif.n=10000" was generated
+as follows with a debug-build binary.
+  $ valgrind --tool=massif --massif-out-file=massif.n=10000 \
+             ./how-to-free-memory-of-JIT-function 10000
+
+The result indicates that the memory consumption is growing as time passes.
+--------------------------------------------------------------------------------
+Command:            ./how-to-free-memory-of-JIT-function 10000
+Massif arguments:   --massif-out-file=massif.n=10000
+ms_print arguments: massif.n=10000
+--------------------------------------------------------------------------------
+
+
+    MB
+2.768^                                                                       #
+     |                                                                  @@@@@#
+     |                                            @             :::@::::@ @ @#
+     |                                            @    :::::::::: :@: : @ @ @#
+     |                                            @::::::::::: :: :@: : @ @ @#
+     |                                            @:: :::::::: :: :@: : @ @ @#
+     |                                            @:: :::::::: :: :@: : @ @ @#
+     |                                            @:: :::::::: :: :@: : @ @ @#
+     |                                     @@:::@@@:: :::::::: :: :@: : @ @ @#
+     |                            @:::@::::@ :: @@@:: :::::::: :: :@: : @ @ @#
+     |                       :::::@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     |                       : : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     |                       : : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     |               ::::::::: : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     |           :::::: : :: : : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     |       ::::: : :: : :: : : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     |    @:::: :: : :: : :: : : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     | :::@: :: :: : :: : :: : : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     | : :@: :: :: : :: : :: : : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+     | : :@: :: :: : :: : :: : : :@:  @:: :@ :: @@@:: :::::::: :: :@: : @ @ @#
+   0 +----------------------------------------------------------------------->Gi
+     0                                                                   74.60
+
+Number of snapshots: 52
+ Detailed snapshots: [3, 18, 20, 24, 27, 28, 29, 43, 46, 47, 48, 51 (peak)]
+
+--------------------------------------------------------------------------------
+  n        time(i)         total(B)   useful-heap(B) extra-heap(B)    stacks(B)
+--------------------------------------------------------------------------------
+  0              0                0                0             0            0
+  1  2,108,786,094          518,224          510,082         8,142            0
+  2  3,818,198,227          579,832          571,494         8,338            0
+  3  5,375,140,134          608,464          599,674         8,790            0
+
+
