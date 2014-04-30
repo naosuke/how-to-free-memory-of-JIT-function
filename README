@@ -1,5 +1,11 @@
-How To Free Memory of JIT'd Function
-====================================
+# This repository was just for the post on LLVMdev ML:
+# http://lists.cs.uiuc.edu/pipermail/llvmdev/2012-January/046604.html
+#
+# And I stopped chasing the issue as I decided to go another path to bypass it:
+# http://lists.cs.uiuc.edu/pipermail/llvmdev/2012-February/047371.html
+
+How To Free Memory of JIT'd Function on LLVM 3.0
+================================================
 
 It's a test just to confirm how to free memory of LLVM JIT'd function
 properly. I thought ExecutionEngine::freeMachineCodeForFunction()
